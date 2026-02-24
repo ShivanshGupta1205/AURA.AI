@@ -1,0 +1,23 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+
+# Data (large files — keep structure, ignore contents)
+data/audio/*
+data/transcripts/*
+data/slides/*
+data/exam_papers/*
+data/outputs/*
+!data/**/.gitkeep
+
+# OS
+.DS_Store
+
+# IDE
+.vscode/
+.idea/
