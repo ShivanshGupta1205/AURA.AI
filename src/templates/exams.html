@@ -1,0 +1,75 @@
+{% extends "base.html" %}
+{% block title %}AURA — Exam Papers — {{ subject.name }}{% endblock %}
+
+{% block body %}
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="brand">🎓 AURA</div>
+    <div class="nav-links">
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('subject_detail', subject_id=subject.id) }}">{{ subject.name }}</a>
+        <span style="opacity:0.6;">|</span>
+        <span style="font-size:0.85rem; opacity:0.8;">{{ user.username }}</span>
+        <a href="{{ url_for('logout') }}" style="opacity:0.7;">Logout</a>
+    </div>
+</nav>
+
+<!-- Stats bar -->
+<div class="stats-bar">
+    <div class="stat-chip">📝 Lectures: <span class="val">{{ stats.total_lectures }}</span></div>
+    <div class="stat-chip">⏱ Recorded: <span class="val">{{ "%.1f"|format(stats.total_duration / 60) }} min</span></div>
+    <div class="stat-chip">🔤 Tokens: <span class="val">{{ "{:,}".format(stats.total_prompt_tokens + stats.total_completion_tokens) }}</span></div>
+    <div class="stat-chip">💰 Cost: <span class="val">${{ "%.4f"|format(stats.total_cost) }}</span></div>
+</div>
+
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="flash flash-{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+    {% endwith %}
+
+    <div class="flex justify-between items-center mb-2">
+        <h2>📄 Exam Papers — {{ subject.name }}</h2>
+        <a href="{{ url_for('subject_detail', subject_id=subject.id) }}" class="btn btn-secondary">← Back</a>
+    </div>
+
+    <!-- Upload form -->
+    <div class="card mb-2">
+        <form method="POST" enctype="multipart/form-data">
+            <div class="form-group">
+                <label>Upload Exam Papers (PDF)</label>
+                <input type="file" name="papers" class="form-input" accept=".pdf" multiple>
+            </div>
+            <button type="submit" class="btn btn-primary">Upload</button>
+        </form>
+    </div>
+
+    <!-- Papers list -->
+    {% if papers %}
+    <div class="card">
+        <h3 class="mb-2" style="font-size:1rem;">Uploaded Papers ({{ papers|length }})</h3>
+        {% for p in papers %}
+        <div class="lecture-row">
+            <div>
+                <div class="title">📄 {{ p.filename }}</div>
+                <div class="date">{{ p.uploaded_at[:16] if p.uploaded_at else 'Unknown date' }}</div>
+            </div>
+            {% if p.file_path %}
+            <a href="{{ url_for('download_file', path=p.file_path) }}" class="btn btn-secondary" style="padding:0.3rem 0.8rem; font-size:0.8rem;">Download</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    <p class="text-muted mt-2" style="font-size:0.85rem; text-align:center;">
+        ⚙️ Paper parsing & topic analysis coming in Phase 2.
+    </p>
+    {% else %}
+    <div class="empty-state">
+        <div class="icon">📄</div>
+        <h3>No papers uploaded</h3>
+        <p>Upload past exam papers above. Analysis features coming in Phase 2.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

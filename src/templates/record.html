@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+{% block title %}AURA — Record Lecture{% endblock %}
+
+{% block body %}
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="brand">🎓 AURA</div>
+    <div class="nav-links">
+        <a href="{{ url_for('home') }}">Home</a>
+        <a href="{{ url_for('subject_detail', subject_id=subject.id) }}">{{ subject.name }}</a>
+        <span style="opacity:0.6;">|</span>
+        <span style="font-size:0.85rem; opacity:0.8;">{{ user.username }}</span>
+        <a href="{{ url_for('logout') }}" style="opacity:0.7;">Logout</a>
+    </div>
+</nav>
+
+<!-- Stats bar -->
+<div class="stats-bar">
+    <div class="stat-chip">📝 Lectures: <span class="val">{{ stats.total_lectures }}</span></div>
+    <div class="stat-chip">⏱ Recorded: <span class="val">{{ "%.1f"|format(stats.total_duration / 60) }} min</span></div>
+    <div class="stat-chip">🔤 Tokens: <span class="val">{{ "{:,}".format(stats.total_prompt_tokens + stats.total_completion_tokens) }}</span></div>
+    <div class="stat-chip">💰 Cost: <span class="val">${{ "%.4f"|format(stats.total_cost) }}</span></div>
+</div>
+
+<div class="container">
+    <h2 class="mb-2">🎙 Record — {{ subject.name }}</h2>
+
+    <!-- Step 1: Setup -->
+    <div id="setup-panel" class="card">
+        <div class="form-group">
+            <label for="lecture-title">Lecture Title</label>
+            <input type="text" id="lecture-title" class="form-input" placeholder="e.g. Lecture 5 — Neural Networks" required>
+        </div>
+        <button id="btn-start" class="btn btn-primary btn-lg" onclick="startRecording()">🎙 Start Recording</button>
+    </div>
+
+    <!-- Step 2: Recording (hidden) -->
+    <div id="recording-panel" class="hidden">
+        <div class="card">
+            <div class="flex justify-between items-center mb-2">
+                <div>
+                    <span class="rec-dot"></span>
+                    <strong>Recording…</strong>
+                    <span id="elapsed" class="text-muted" style="margin-left:0.5rem;">0:00</span>
+                </div>
+                <button id="btn-stop" class="btn btn-danger" onclick="stopRecording()">⏹ Stop Recording</button>
+            </div>
+
+            <div class="flex justify-between items-center mt-1" style="margin-bottom:0.5rem;">
+                <span class="text-muted" style="font-size:0.8rem;">Live Transcript</span>
+                <button class="btn btn-secondary" style="padding:0.3rem 0.8rem; font-size:0.75rem;" onclick="toggleExpand()">Expand / Collapse</button>
+            </div>
+            <div id="transcript-box" class="transcript-box">
+                <span class="text-muted">Waiting for speech…</span>
+            </div>
+        </div>
+    </div>
+
+    <!-- Step 3: Processing (hidden) -->
+    <div id="processing-panel" class="hidden">
+        <div class="card text-center" style="padding:3rem;">
+            <div style="font-size:2rem; margin-bottom:0.5rem;">⏳</div>
+            <h3>Generating Summary…</h3>
+            <p class="text-muted mt-1">This may take a minute depending on lecture length.</p>
+        </div>
+    </div>
+
+    <!-- Step 4: Summary (hidden) -->
+    <div id="summary-panel" class="hidden">
+        <div class="tabs">
+            <button class="tab-btn active" data-group="sum" data-tab="short" onclick="switchTab('sum','short')">Short Summary</button>
+            <button class="tab-btn" data-group="sum" data-tab="long" onclick="switchTab('sum','long')">Detailed Summary</button>
+            <button class="tab-btn" data-group="sum" data-tab="transcript" onclick="switchTab('sum','transcript')">Transcript</button>
+        </div>
+
+        <div class="tab-content active" data-group="sum" data-tab="short">
+            <div id="short-summary" class="summary-content"></div>
+        </div>
+        <div class="tab-content" data-group="sum" data-tab="long">
+            <div id="long-summary" class="summary-content"></div>
+        </div>
+        <div class="tab-content" data-group="sum" data-tab="transcript">
+            <div id="full-transcript" class="summary-content" style="white-space:pre-wrap;"></div>
+        </div>
+
+        <div class="flex gap mt-2">
+            <a id="link-lecture" href="#" class="btn btn-primary">View Lecture Page</a>
+            <a href="{{ url_for('subject_detail', subject_id=subject.id) }}" class="btn btn-secondary">Back to Subject</a>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+const SUBJECT_ID = {{ subject.id }};
+let pollTimer = null;
+let transcriptPath = null;
+let elapsedSeconds = 0;
+
+function fmtTime(s) {
+    const m = Math.floor(s / 60);
+    const sec = Math.floor(s % 60);
+    return m + ':' + String(sec).padStart(2, '0');
+}
+
+function show(id) { document.getElementById(id).classList.remove('hidden'); }
+function hide(id) { document.getElementById(id).classList.add('hidden'); }
+
+function toggleExpand() {
+    document.getElementById('transcript-box').classList.toggle('expanded');
+}
+
+async function startRecording() {
+    const title = document.getElementById('lecture-title').value.trim();
+    if (!title) { alert('Please enter a lecture title.'); return; }
+
+    const res = await fetch('/api/record/start', { method: 'POST' });
+    const data = await res.json();
+    if (!data.ok) { alert(data.error || 'Failed to start recording.'); return; }
+
+    hide('setup-panel');
+    show('recording-panel');
+    document.getElementById('transcript-box').innerHTML = '<span class="text-muted">Waiting for speech…</span>';
+
+    pollTimer = setInterval(pollStatus, 1500);
+}
+
+async function pollStatus() {
+    try {
+        const res = await fetch('/api/record/status');
+        const data = await res.json();
+
+        document.getElementById('elapsed').textContent = fmtTime(data.elapsed);
+        elapsedSeconds = data.elapsed;
+
+        if (data.texts && data.texts.length > 0) {
+            const box = document.getElementById('transcript-box');
+            box.textContent = data.texts.join(' ');
+            box.scrollTop = box.scrollHeight;
+        }
+    } catch(e) { /* ignore polling errors */ }
+}
+
+async function stopRecording() {
+    if (pollTimer) { clearInterval(pollTimer); pollTimer = null; }
+
+    document.getElementById('btn-stop').disabled = true;
+    document.getElementById('btn-stop').textContent = 'Stopping…';
+
+    const res = await fetch('/api/record/stop', { method: 'POST' });
+    const data = await res.json();
+
+    if (!data.ok) {
+        alert(data.error || 'Stop failed.');
+        document.getElementById('btn-stop').disabled = false;
+        document.getElementById('btn-stop').textContent = '⏹ Stop Recording';
+        return;
+    }
+
+    transcriptPath = data.transcript_path;
+    elapsedSeconds = data.elapsed;
+
+    hide('recording-panel');
+    show('processing-panel');
+
+    // Trigger summarization
+    const title = document.getElementById('lecture-title').value.trim();
+    const sumRes = await fetch('/api/summarize', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            transcript_path: transcriptPath,
+            subject_id: SUBJECT_ID,
+            title: title,
+            elapsed: elapsedSeconds,
+        }),
+    });
+    const sumData = await sumRes.json();
+
+    hide('processing-panel');
+
+    if (!sumData.ok) {
+        alert('Summarization failed: ' + (sumData.error || 'unknown error'));
+        show('setup-panel');
+        return;
+    }
+
+    // Render summaries
+    document.getElementById('short-summary').innerHTML = marked.parse(sumData.short_summary || '_No summary available._');
+    document.getElementById('long-summary').innerHTML = marked.parse(sumData.long_summary || '_No summary available._');
+
+    // Show transcript text
+    const box = document.getElementById('transcript-box');
+    document.getElementById('full-transcript').textContent = box.textContent;
+
+    // Link to lecture page
+    document.getElementById('link-lecture').href = '/lecture/' + sumData.lecture_id;
+
+    show('summary-panel');
+}
+</script>
+{% endblock %}

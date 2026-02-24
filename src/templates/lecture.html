@@ -1,0 +1,73 @@
+{% extends "base.html" %}
+{% block title %}AURA — {{ lecture.title }}{% endblock %}
+
+{% block body %}
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="brand">🎓 AURA</div>
+    <div class="nav-links">
+        <a href="{{ url_for('home') }}">Home</a>
+        <span style="opacity:0.6;">|</span>
+        <span style="font-size:0.85rem; opacity:0.8;">{{ user.username }}</span>
+        <a href="{{ url_for('logout') }}" style="opacity:0.7;">Logout</a>
+    </div>
+</nav>
+
+<!-- Stats bar -->
+<div class="stats-bar">
+    <div class="stat-chip">📝 Lectures: <span class="val">{{ stats.total_lectures }}</span></div>
+    <div class="stat-chip">⏱ Recorded: <span class="val">{{ "%.1f"|format(stats.total_duration / 60) }} min</span></div>
+    <div class="stat-chip">🔤 Tokens: <span class="val">{{ "{:,}".format(stats.total_prompt_tokens + stats.total_completion_tokens) }}</span></div>
+    <div class="stat-chip">💰 Cost: <span class="val">${{ "%.4f"|format(stats.total_cost) }}</span></div>
+</div>
+
+<div class="container-wide">
+    <div class="flex justify-between items-center mb-2">
+        <div>
+            <h2>{{ lecture.title }}</h2>
+            <span class="text-muted" style="font-size:0.85rem;">
+                {{ lecture.created_at[:16] }} &middot;
+                {{ "%.1f"|format((lecture.duration_seconds or 0) / 60) }} min
+            </span>
+        </div>
+        <div class="flex gap">
+            {% if lecture.short_summary_path %}
+            <a href="{{ url_for('download_file', path=lecture.short_summary_path) }}" class="btn btn-secondary">⬇ Short Summary</a>
+            {% endif %}
+            {% if lecture.long_summary_path %}
+            <a href="{{ url_for('download_file', path=lecture.long_summary_path) }}" class="btn btn-secondary">⬇ Detailed Summary</a>
+            {% endif %}
+            {% if lecture.transcript_path %}
+            <a href="{{ url_for('download_file', path=lecture.transcript_path) }}" class="btn btn-secondary">⬇ Transcript</a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Tabs -->
+    <div class="tabs">
+        <button class="tab-btn active" data-group="lec" data-tab="short" onclick="switchTab('lec','short')">Short Summary</button>
+        <button class="tab-btn" data-group="lec" data-tab="long" onclick="switchTab('lec','long')">Detailed Summary</button>
+        <button class="tab-btn" data-group="lec" data-tab="transcript" onclick="switchTab('lec','transcript')">Full Transcript</button>
+    </div>
+
+    <div class="tab-content active" data-group="lec" data-tab="short">
+        <div id="short-md" class="summary-content"></div>
+    </div>
+    <div class="tab-content" data-group="lec" data-tab="long">
+        <div id="long-md" class="summary-content"></div>
+    </div>
+    <div class="tab-content" data-group="lec" data-tab="transcript">
+        <div class="summary-content" style="white-space:pre-wrap;">{{ transcript_text }}</div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+    // Render markdown content
+    const shortSrc = {{ short_summary | tojson }};
+    const longSrc = {{ long_summary | tojson }};
+    document.getElementById('short-md').innerHTML = marked.parse(shortSrc || '_No summary available._');
+    document.getElementById('long-md').innerHTML = marked.parse(longSrc || '_No summary available._');
+</script>
+{% endblock %}

@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}AURA — Home{% endblock %}
+
+{% block body %}
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="brand">🎓 AURA</div>
+    <div class="nav-links">
+        <a href="{{ url_for('home') }}">Home</a>
+        <span style="opacity:0.6;">|</span>
+        <span style="font-size:0.85rem; opacity:0.8;">{{ user.username }}</span>
+        <a href="{{ url_for('logout') }}" style="opacity:0.7;">Logout</a>
+    </div>
+</nav>
+
+<!-- Stats bar -->
+<div class="stats-bar">
+    <div class="stat-chip">📝 Lectures: <span class="val">{{ stats.total_lectures }}</span></div>
+    <div class="stat-chip">⏱ Recorded: <span class="val">{{ "%.1f"|format(stats.total_duration / 60) }} min</span></div>
+    <div class="stat-chip">🔤 Tokens: <span class="val">{{ "{:,}".format(stats.total_prompt_tokens + stats.total_completion_tokens) }}</span></div>
+    <div class="stat-chip">💰 Cost: <span class="val">${{ "%.4f"|format(stats.total_cost) }}</span></div>
+</div>
+
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="flash flash-{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+    {% endwith %}
+
+    <!-- Header row -->
+    <div class="flex justify-between items-center mb-2">
+        <h2>Your Subjects</h2>
+        <button class="btn btn-primary" onclick="document.getElementById('add-form').classList.toggle('hidden')">+ New Subject</button>
+    </div>
+
+    <!-- Add subject form (hidden by default) -->
+    <div id="add-form" class="hidden card mb-2">
+        <form method="POST" action="{{ url_for('add_subject') }}" class="flex gap items-center">
+            <input type="text" name="name" class="form-input" placeholder="Subject name (e.g. Machine Learning)" required style="flex:1;">
+            <button type="submit" class="btn btn-success">Create</button>
+        </form>
+    </div>
+
+    {% if subjects %}
+    <div class="subject-grid">
+        {% for s in subjects %}
+        <a href="{{ url_for('subject_detail', subject_id=s.id) }}" style="text-decoration:none; color:inherit;">
+            <div class="subject-card">
+                <div class="icon">📚</div>
+                <div class="name">{{ s.name }}</div>
+                <div class="meta">Created {{ s.created_at[:10] }}</div>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="icon">📖</div>
+        <h3>No subjects yet</h3>
+        <p>Click <strong>+ New Subject</strong> above to add your first course.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}

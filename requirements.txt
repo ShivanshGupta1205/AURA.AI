@@ -1,0 +1,25 @@
+# ── AURA — core dependencies ────────────────────────────────────────────
+# Install:  pip install -r requirements.txt
+
+# Audio capture
+sounddevice
+soundfile
+
+# ASR — default backend (CPU / macOS friendly)
+faster-whisper
+resampy                # resampling to 16 kHz when needed
+
+# -- Optional: NVIDIA Parakeet (requires CUDA GPU) ----------------------
+# Uncomment the line below if you have an NVIDIA GPU and want to use
+# Parakeet models (parakeet-ctc-1.1b / parakeet-rnnt-1.1b / parakeet-tdt-1.1b)
+# nemo_toolkit[asr]
+
+# LLM
+openai>=1.0
+python-dotenv
+
+# Web UI
+flask
+
+# Shared
+numpy

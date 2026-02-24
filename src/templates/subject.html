@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}AURA — {{ subject.name }}{% endblock %}
+
+{% block body %}
+<!-- Navbar -->
+<nav class="navbar">
+    <div class="brand">🎓 AURA</div>
+    <div class="nav-links">
+        <a href="{{ url_for('home') }}">Home</a>
+        <span style="opacity:0.6;">|</span>
+        <span style="font-size:0.85rem; opacity:0.8;">{{ user.username }}</span>
+        <a href="{{ url_for('logout') }}" style="opacity:0.7;">Logout</a>
+    </div>
+</nav>
+
+<!-- Stats bar -->
+<div class="stats-bar">
+    <div class="stat-chip">📝 Lectures: <span class="val">{{ stats.total_lectures }}</span></div>
+    <div class="stat-chip">⏱ Recorded: <span class="val">{{ "%.1f"|format(stats.total_duration / 60) }} min</span></div>
+    <div class="stat-chip">🔤 Tokens: <span class="val">{{ "{:,}".format(stats.total_prompt_tokens + stats.total_completion_tokens) }}</span></div>
+    <div class="stat-chip">💰 Cost: <span class="val">${{ "%.4f"|format(stats.total_cost) }}</span></div>
+</div>
+
+<div class="container">
+    {% with messages = get_flashed_messages(with_categories=true) %}
+    {% for cat, msg in messages %}
+    <div class="flash flash-{{ cat }}">{{ msg }}</div>
+    {% endfor %}
+    {% endwith %}
+
+    <!-- Subject header -->
+    <div class="flex justify-between items-center mb-2">
+        <div>
+            <h2>📚 {{ subject.name }}</h2>
+            <span class="text-muted" style="font-size:0.85rem;">{{ lectures|length }} lecture{{ 's' if lectures|length != 1 }} recorded</span>
+        </div>
+        <div class="flex gap">
+            <a href="{{ url_for('record_page', subject_id=subject.id) }}" class="btn btn-primary">🎙 Record Lecture</a>
+            <a href="{{ url_for('exam_papers', subject_id=subject.id) }}" class="btn btn-secondary">📄 Exam Papers</a>
+            <form method="POST" action="{{ url_for('remove_subject', subject_id=subject.id) }}" onsubmit="return confirm('Delete this subject? This cannot be undone.');" style="display:inline;">
+                <button type="submit" class="btn btn-danger">🗑 Delete</button>
+            </form>
+        </div>
+    </div>
+
+    {% if lectures %}
+    <div class="card">
+        {% for lec in lectures %}
+        <a href="{{ url_for('view_lecture', lecture_id=lec.id) }}" class="lecture-row" style="text-decoration:none; color:inherit;">
+            <div>
+                <div class="title">{{ lec.title }}</div>
+                <div class="date">{{ lec.created_at[:16] }} &middot; {{ "%.1f"|format((lec.duration_seconds or 0) / 60) }} min</div>
+            </div>
+            <span class="text-muted" style="font-size:1.2rem;">→</span>
+        </a>
+        {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+        <div class="icon">🎙</div>
+        <h3>No lectures yet</h3>
+        <p>Click <strong>Record Lecture</strong> to capture and summarize your first lecture.</p>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
