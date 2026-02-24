@@ -4,7 +4,7 @@
 {% block body %}
 <!-- Navbar -->
 <nav class="navbar">
-    <div class="brand">🎓 AURA</div>
+    <div class="brand">AURA</div>
     <div class="nav-links">
         <a href="{{ url_for('home') }}">Home</a>
         <span style="opacity:0.6;">|</span>
@@ -15,10 +15,10 @@
 
 <!-- Stats bar -->
 <div class="stats-bar">
-    <div class="stat-chip">📝 Lectures: <span class="val">{{ stats.total_lectures }}</span></div>
-    <div class="stat-chip">⏱ Recorded: <span class="val">{{ "%.1f"|format(stats.total_duration / 60) }} min</span></div>
-    <div class="stat-chip">🔤 Tokens: <span class="val">{{ "{:,}".format(stats.total_prompt_tokens + stats.total_completion_tokens) }}</span></div>
-    <div class="stat-chip">💰 Cost: <span class="val">${{ "%.4f"|format(stats.total_cost) }}</span></div>
+    <div class="stat-chip">Lectures: <span class="val">{{ stats.total_lectures }}</span></div>
+    <div class="stat-chip">Recorded: <span class="val">{{ "%.1f"|format(stats.total_duration / 60) }} min</span></div>
+    <div class="stat-chip">Tokens: <span class="val">{{ "{:,}".format(stats.total_prompt_tokens + stats.total_completion_tokens) }}</span></div>
+    <div class="stat-chip">Cost: <span class="val">${{ "%.4f"|format(stats.total_cost) }}</span></div>
 </div>
 
 <div class="container-wide">
@@ -32,13 +32,13 @@
         </div>
         <div class="flex gap">
             {% if lecture.short_summary_path %}
-            <a href="{{ url_for('download_file', path=lecture.short_summary_path) }}" class="btn btn-secondary">⬇ Short Summary</a>
+            <a href="{{ url_for('download_file', path=lecture.short_summary_path) }}" class="btn btn-secondary">Download Short Summary</a>
             {% endif %}
             {% if lecture.long_summary_path %}
-            <a href="{{ url_for('download_file', path=lecture.long_summary_path) }}" class="btn btn-secondary">⬇ Detailed Summary</a>
+            <a href="{{ url_for('download_file', path=lecture.long_summary_path) }}" class="btn btn-secondary">Download Detailed Summary</a>
             {% endif %}
             {% if lecture.transcript_path %}
-            <a href="{{ url_for('download_file', path=lecture.transcript_path) }}" class="btn btn-secondary">⬇ Transcript</a>
+            <a href="{{ url_for('download_file', path=lecture.transcript_path) }}" class="btn btn-secondary">Download Transcript</a>
             {% endif %}
         </div>
     </div>

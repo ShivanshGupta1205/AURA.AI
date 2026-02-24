@@ -4,7 +4,7 @@
 {% block body %}
 <!-- Navbar -->
 <nav class="navbar">
-    <div class="brand">🎓 AURA</div>
+    <div class="brand">AURA</div>
     <div class="nav-links">
         <a href="{{ url_for('home') }}">Home</a>
         <a href="{{ url_for('subject_detail', subject_id=subject.id) }}">{{ subject.name }}</a>
@@ -16,14 +16,14 @@
 
 <!-- Stats bar -->
 <div class="stats-bar">
-    <div class="stat-chip">📝 Lectures: <span class="val">{{ stats.total_lectures }}</span></div>
-    <div class="stat-chip">⏱ Recorded: <span class="val">{{ "%.1f"|format(stats.total_duration / 60) }} min</span></div>
-    <div class="stat-chip">🔤 Tokens: <span class="val">{{ "{:,}".format(stats.total_prompt_tokens + stats.total_completion_tokens) }}</span></div>
-    <div class="stat-chip">💰 Cost: <span class="val">${{ "%.4f"|format(stats.total_cost) }}</span></div>
+    <div class="stat-chip">Lectures: <span class="val">{{ stats.total_lectures }}</span></div>
+    <div class="stat-chip">Recorded: <span class="val">{{ "%.1f"|format(stats.total_duration / 60) }} min</span></div>
+    <div class="stat-chip">Tokens: <span class="val">{{ "{:,}".format(stats.total_prompt_tokens + stats.total_completion_tokens) }}</span></div>
+    <div class="stat-chip">Cost: <span class="val">${{ "%.4f"|format(stats.total_cost) }}</span></div>
 </div>
 
 <div class="container">
-    <h2 class="mb-2">🎙 Record — {{ subject.name }}</h2>
+    <h2 class="mb-2">Record — {{ subject.name }}</h2>
 
     <!-- Step 1: Setup -->
     <div id="setup-panel" class="card">
@@ -31,7 +31,7 @@
             <label for="lecture-title">Lecture Title</label>
             <input type="text" id="lecture-title" class="form-input" placeholder="e.g. Lecture 5 — Neural Networks" required>
         </div>
-        <button id="btn-start" class="btn btn-primary btn-lg" onclick="startRecording()">🎙 Start Recording</button>
+        <button id="btn-start" class="btn btn-primary btn-lg" onclick="startRecording()">Start Recording</button>
     </div>
 
     <!-- Step 2: Recording (hidden) -->
@@ -43,7 +43,7 @@
                     <strong>Recording…</strong>
                     <span id="elapsed" class="text-muted" style="margin-left:0.5rem;">0:00</span>
                 </div>
-                <button id="btn-stop" class="btn btn-danger" onclick="stopRecording()">⏹ Stop Recording</button>
+                <button id="btn-stop" class="btn btn-danger" onclick="stopRecording()">Stop Recording</button>
             </div>
 
             <div class="flex justify-between items-center mt-1" style="margin-bottom:0.5rem;">
@@ -59,7 +59,7 @@
     <!-- Step 3: Processing (hidden) -->
     <div id="processing-panel" class="hidden">
         <div class="card text-center" style="padding:3rem;">
-            <div style="font-size:2rem; margin-bottom:0.5rem;">⏳</div>
+            <div class="spinner" style="margin-bottom:1rem;"></div>
             <h3>Generating Summary…</h3>
             <p class="text-muted mt-1">This may take a minute depending on lecture length.</p>
         </div>
@@ -154,7 +154,7 @@ async function stopRecording() {
     if (!data.ok) {
         alert(data.error || 'Stop failed.');
         document.getElementById('btn-stop').disabled = false;
-        document.getElementById('btn-stop').textContent = '⏹ Stop Recording';
+        document.getElementById('btn-stop').textContent = 'Stop Recording';
         return;
     }
 

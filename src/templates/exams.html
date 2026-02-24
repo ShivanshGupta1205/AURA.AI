@@ -4,7 +4,7 @@
 {% block body %}
 <!-- Navbar -->
 <nav class="navbar">
-    <div class="brand">🎓 AURA</div>
+    <div class="brand">AURA</div>
     <div class="nav-links">
         <a href="{{ url_for('home') }}">Home</a>
         <a href="{{ url_for('subject_detail', subject_id=subject.id) }}">{{ subject.name }}</a>
@@ -16,10 +16,10 @@
 
 <!-- Stats bar -->
 <div class="stats-bar">
-    <div class="stat-chip">📝 Lectures: <span class="val">{{ stats.total_lectures }}</span></div>
-    <div class="stat-chip">⏱ Recorded: <span class="val">{{ "%.1f"|format(stats.total_duration / 60) }} min</span></div>
-    <div class="stat-chip">🔤 Tokens: <span class="val">{{ "{:,}".format(stats.total_prompt_tokens + stats.total_completion_tokens) }}</span></div>
-    <div class="stat-chip">💰 Cost: <span class="val">${{ "%.4f"|format(stats.total_cost) }}</span></div>
+    <div class="stat-chip">Lectures: <span class="val">{{ stats.total_lectures }}</span></div>
+    <div class="stat-chip">Recorded: <span class="val">{{ "%.1f"|format(stats.total_duration / 60) }} min</span></div>
+    <div class="stat-chip">Tokens: <span class="val">{{ "{:,}".format(stats.total_prompt_tokens + stats.total_completion_tokens) }}</span></div>
+    <div class="stat-chip">Cost: <span class="val">${{ "%.4f"|format(stats.total_cost) }}</span></div>
 </div>
 
 <div class="container">
@@ -30,7 +30,7 @@
     {% endwith %}
 
     <div class="flex justify-between items-center mb-2">
-        <h2>📄 Exam Papers — {{ subject.name }}</h2>
+        <h2>Exam Papers — {{ subject.name }}</h2>
         <a href="{{ url_for('subject_detail', subject_id=subject.id) }}" class="btn btn-secondary">← Back</a>
     </div>
 
@@ -52,7 +52,7 @@
         {% for p in papers %}
         <div class="lecture-row">
             <div>
-                <div class="title">📄 {{ p.filename }}</div>
+                <div class="title">{{ p.filename }}</div>
                 <div class="date">{{ p.uploaded_at[:16] if p.uploaded_at else 'Unknown date' }}</div>
             </div>
             {% if p.file_path %}
@@ -62,11 +62,11 @@
         {% endfor %}
     </div>
     <p class="text-muted mt-2" style="font-size:0.85rem; text-align:center;">
-        ⚙️ Paper parsing & topic analysis coming in Phase 2.
+        Paper parsing & topic analysis coming in Phase 2.
     </p>
     {% else %}
     <div class="empty-state">
-        <div class="icon">📄</div>
+        <div class="icon">+</div>
         <h3>No papers uploaded</h3>
         <p>Upload past exam papers above. Analysis features coming in Phase 2.</p>
     </div>

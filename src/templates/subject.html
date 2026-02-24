@@ -4,7 +4,7 @@
 {% block body %}
 <!-- Navbar -->
 <nav class="navbar">
-    <div class="brand">🎓 AURA</div>
+    <div class="brand">AURA</div>
     <div class="nav-links">
         <a href="{{ url_for('home') }}">Home</a>
         <span style="opacity:0.6;">|</span>
@@ -15,10 +15,10 @@
 
 <!-- Stats bar -->
 <div class="stats-bar">
-    <div class="stat-chip">📝 Lectures: <span class="val">{{ stats.total_lectures }}</span></div>
-    <div class="stat-chip">⏱ Recorded: <span class="val">{{ "%.1f"|format(stats.total_duration / 60) }} min</span></div>
-    <div class="stat-chip">🔤 Tokens: <span class="val">{{ "{:,}".format(stats.total_prompt_tokens + stats.total_completion_tokens) }}</span></div>
-    <div class="stat-chip">💰 Cost: <span class="val">${{ "%.4f"|format(stats.total_cost) }}</span></div>
+    <div class="stat-chip">Lectures: <span class="val">{{ stats.total_lectures }}</span></div>
+    <div class="stat-chip">Recorded: <span class="val">{{ "%.1f"|format(stats.total_duration / 60) }} min</span></div>
+    <div class="stat-chip">Tokens: <span class="val">{{ "{:,}".format(stats.total_prompt_tokens + stats.total_completion_tokens) }}</span></div>
+    <div class="stat-chip">Cost: <span class="val">${{ "%.4f"|format(stats.total_cost) }}</span></div>
 </div>
 
 <div class="container">
@@ -31,14 +31,14 @@
     <!-- Subject header -->
     <div class="flex justify-between items-center mb-2">
         <div>
-            <h2>📚 {{ subject.name }}</h2>
+            <h2>{{ subject.name }}</h2>
             <span class="text-muted" style="font-size:0.85rem;">{{ lectures|length }} lecture{{ 's' if lectures|length != 1 }} recorded</span>
         </div>
         <div class="flex gap">
-            <a href="{{ url_for('record_page', subject_id=subject.id) }}" class="btn btn-primary">🎙 Record Lecture</a>
-            <a href="{{ url_for('exam_papers', subject_id=subject.id) }}" class="btn btn-secondary">📄 Exam Papers</a>
+            <a href="{{ url_for('record_page', subject_id=subject.id) }}" class="btn btn-primary">Record Lecture</a>
+            <a href="{{ url_for('exam_papers', subject_id=subject.id) }}" class="btn btn-secondary">Exam Papers</a>
             <form method="POST" action="{{ url_for('remove_subject', subject_id=subject.id) }}" onsubmit="return confirm('Delete this subject? This cannot be undone.');" style="display:inline;">
-                <button type="submit" class="btn btn-danger">🗑 Delete</button>
+                <button type="submit" class="btn btn-danger">Delete</button>
             </form>
         </div>
     </div>
@@ -57,7 +57,7 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <div class="icon">🎙</div>
+        <div class="icon">+</div>
         <h3>No lectures yet</h3>
         <p>Click <strong>Record Lecture</strong> to capture and summarize your first lecture.</p>
     </div>

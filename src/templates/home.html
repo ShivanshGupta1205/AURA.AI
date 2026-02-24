@@ -4,7 +4,7 @@
 {% block body %}
 <!-- Navbar -->
 <nav class="navbar">
-    <div class="brand">🎓 AURA</div>
+    <div class="brand">AURA</div>
     <div class="nav-links">
         <a href="{{ url_for('home') }}">Home</a>
         <span style="opacity:0.6;">|</span>
@@ -15,10 +15,10 @@
 
 <!-- Stats bar -->
 <div class="stats-bar">
-    <div class="stat-chip">📝 Lectures: <span class="val">{{ stats.total_lectures }}</span></div>
-    <div class="stat-chip">⏱ Recorded: <span class="val">{{ "%.1f"|format(stats.total_duration / 60) }} min</span></div>
-    <div class="stat-chip">🔤 Tokens: <span class="val">{{ "{:,}".format(stats.total_prompt_tokens + stats.total_completion_tokens) }}</span></div>
-    <div class="stat-chip">💰 Cost: <span class="val">${{ "%.4f"|format(stats.total_cost) }}</span></div>
+    <div class="stat-chip">Lectures: <span class="val">{{ stats.total_lectures }}</span></div>
+    <div class="stat-chip">Recorded: <span class="val">{{ "%.1f"|format(stats.total_duration / 60) }} min</span></div>
+    <div class="stat-chip">Tokens: <span class="val">{{ "{:,}".format(stats.total_prompt_tokens + stats.total_completion_tokens) }}</span></div>
+    <div class="stat-chip">Cost: <span class="val">${{ "%.4f"|format(stats.total_cost) }}</span></div>
 </div>
 
 <div class="container">
@@ -47,7 +47,7 @@
         {% for s in subjects %}
         <a href="{{ url_for('subject_detail', subject_id=s.id) }}" style="text-decoration:none; color:inherit;">
             <div class="subject-card">
-                <div class="icon">📚</div>
+                <div class="icon">{{ s.name[:1] | upper }}</div>
                 <div class="name">{{ s.name }}</div>
                 <div class="meta">Created {{ s.created_at[:10] }}</div>
             </div>
@@ -56,7 +56,7 @@
     </div>
     {% else %}
     <div class="empty-state">
-        <div class="icon">📖</div>
+        <div class="icon">+</div>
         <h3>No subjects yet</h3>
         <p>Click <strong>+ New Subject</strong> above to add your first course.</p>
     </div>

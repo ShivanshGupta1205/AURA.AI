@@ -52,6 +52,10 @@ app.secret_key = os.environ.get("FLASK_SECRET", "aura-dev-secret-key-change-me")
 
 init_db()
 
+# Clear all sessions on every fresh app start so users must log in
+with app.app_context():
+    app.secret_key = os.urandom(24).hex()
+
 # ── Globals for the recording worker (single-user local app) ───────────────
 
 _transcriber: FasterWhisperTranscriber | None = None
